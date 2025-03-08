@@ -31,3 +31,15 @@ jobs:
 
       - name: Verify Pushed Image
         run: docker pull devcodes9/banking-monorepo:latest
+
+        - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo docker pull devcodes9/banking-monorepo:latest
+            sudo docker stop banking-monorepo || true
+            sudo docker rm banking-monorepo || true
+            sudo docker run -d --name banking-monorepo -p 3005:3000 devcodes9/banking-monorepo:latest
